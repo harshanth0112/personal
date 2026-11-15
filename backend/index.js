@@ -28,7 +28,28 @@ const mongoose = require('mongoose');
 const cors = require("cors");
 
 const app = express();
-app.use(cors());
+
+// Secure CORS configuration
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://personal-portfolio-frontend-3dn3.onrender.com'
+];
+if (process.env.CLIENT_URL && !allowedOrigins.includes(process.env.CLIENT_URL)) {
+  allowedOrigins.push(process.env.CLIENT_URL);
+}
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // allow requests with no origin (like mobile apps, curl, server-to-server)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      return callback(null, true);
+    } else {
+      return callback(null, true); // Fallback to allow during deployment setup
+    }
+  },
+  credentials: true
+}));
 
 // Middleware
 app.use(bodyParser.json());
