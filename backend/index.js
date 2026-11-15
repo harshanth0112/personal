@@ -33,16 +33,38 @@ app.use(cors());
 // Middleware
 app.use(bodyParser.json());
 
-// MongoDB Connection
-const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/blogDB';
+// MongoDB Connection with secure options
+const mongoURI = process.env.MONGODB_URI;
 
-mongoose.connect(mongoURI)
-  .then(() => {
-    console.log("Connected Successfully to MongoDB Atlas!");
-  })
-  .catch((err) => {
-    console.error("MongoDB Connection Error:", err.message);
-  });
+if (!mongoURI) {
+  console.error("CRITICAL ERROR: MONGODB_URI is not set in environment variables!");
+  process.exit(1);
+}
+
+mongoose.connect(mongoURI, {
+  serverSelectionTimeoutMS: 5000,
+  autoIndex: false, // Prevents production indexing overhead
+})
+.then(() => {
+  console.log("Connected Successfully and Securely to MongoDB Atlas!");
+})
+.catch((err) => {
+  console.error("MongoDB Connection Error:", err.message);
+});
+
+// Graceful connection error handler & shutdown
+mongoose.connection.on('error', err => {
+  console.error('MongoDB runtime connection error:', err);
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.warn('MongoDB disconnected. Reconnecting...');
+});
+
+process.on('SIGINT', async () => {
+  await mongoose.connection.close();
+  process.exit(0);
+});
 
 
 // Define Schema
