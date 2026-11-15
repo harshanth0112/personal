@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { auth, googleProvider } from '../config/firebase';
 
+const ADMIN_EMAIL = process.env.REACT_APP_ADMIN_EMAIL || "harshanthr064@gmail.com";
+
 function Login() {
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
@@ -41,10 +43,31 @@ function Login() {
         }
     };
 
+    const fillAdminCredentials = () => {
+        setEmail(ADMIN_EMAIL);
+        setPassword('Admin@123');
+    };
+
     return (
         <div className="flex justify-center items-center min-h-[80vh] bg-gray-50 py-10">
             <div className="p-8 md:p-10 bg-white rounded-xl shadow-lg border w-full max-w-md">
-                <h2 className="text-3xl font-bold mb-6 text-gray-800 text-center">Login</h2>
+                <h2 className="text-3xl font-bold mb-4 text-gray-800 text-center">Login</h2>
+
+                {/* Quick 1-Click Admin Demo Fill */}
+                <div className="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-5 text-xs text-orange-800 flex items-center justify-between">
+                    <div>
+                        <span className="font-bold block">👑 Admin Credentials:</span>
+                        <span className="text-gray-600 block">{ADMIN_EMAIL}</span>
+                        <span className="text-gray-600 font-mono block">Pass: Admin@123</span>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={fillAdminCredentials}
+                        className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-3 py-1.5 rounded transition shadow-sm text-xs"
+                    >
+                        Auto-Fill
+                    </button>
+                </div>
 
                 {error && (
                     <div className="bg-red-50 border border-red-200 text-red-600 text-sm p-3 rounded mb-4">
